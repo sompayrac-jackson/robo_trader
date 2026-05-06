@@ -2,6 +2,7 @@ import os
 import math
 import json
 import functools
+from datetime import timedelta
 from flask import Flask, render_template, request, redirect, url_for, session
 from dotenv import load_dotenv
 from paper_trader import load_portfolio
@@ -17,6 +18,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
+app.permanent_session_lifetime = timedelta(hours=8)
 
 
 def login_required(f):
@@ -37,6 +39,7 @@ def login_page():
     error = None
     if request.method == 'POST':
         if request.form.get('password') == os.getenv('DASHBOARD_PASSWORD'):
+            session.permanent = True
             session['authenticated'] = True
             return redirect(url_for('index'))
         error = 'Incorrect password.'
