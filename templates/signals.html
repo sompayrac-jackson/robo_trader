@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% set active = 'signals' %}
+
+{% block content %}
+
+<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+  <h2 style="margin:0;">Strategy Signals</h2>
+  <a href="/scan" class="btn" id="scan-btn">Refresh Scan</a>
+</div>
+
+{% if error %}
+  <div class="error">Error connecting to Robinhood: {{ error }}</div>
+{% endif %}
+
+<table>
+  <thead>
+    <tr>
+      <th>Symbol</th>
+      <th>Price</th>
+      <th>RSI Signal</th>
+      <th>RSI Value</th>
+      <th>MA Signal</th>
+      <th>Combined</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if signals %}
+      {% for s in signals %}
+      <tr>
+        <td><strong>{{ s.symbol }}</strong></td>
+        <td>{% if s.price %}${{ "%.2f"|format(s.price) }}{% else %}—{% endif %}</td>
+        <td><span class="badge {{ s.rsi_action }}">{{ s.rsi_action }}</span></td>
+        <td>{% if s.rsi_value %}{{ "%.1f"|format(s.rsi_value) }}{% else %}—{% endif %}</td>
+        <td><span class="badge {{ s.ma_action }}">{{ s.ma_action }}</span></td>
+        <td><span class="badge {{ s.combined }}">{{ s.combined }}</span></td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      {% if not error %}
+        <tr><td colspan="6" class="empty">No signals — click Refresh Scan to run.</td></tr>
+      {% endif %}
+    {% endif %}
+  </tbody>
+</table>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.getElementById('scan-btn').addEventListener('click', function(e) {
+    this.textContent = 'Scanning…';
+    this.classList.add('loading');
+  });
+</script>
+{% endblock %}

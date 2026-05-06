@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% set active = 'portfolio' %}
+
+{% block content %}
+
+{% set total_equity = portfolio.cash %}
+{% for symbol, pos in portfolio.positions.items() %}
+  {% set total_equity = total_equity + (pos.shares * pos.avg_price) %}
+{% endfor %}
+
+{% set realized_pnl = namespace(val=0) %}
+{% for t in portfolio.trades %}
+  {% if t.pnl is defined %}
+    {% set realized_pnl.val = realized_pnl.val + t.pnl %}
+  {% endif %}
+{% endfor %}
+
+<div class="cards">
+  <div class="card">
+    <div class="label">Total Equity</div>
+    <div class="value">${{ "%.2f"|format(total_equity) }}</div>
+  </div>
+  <div class="card">
+    <div class="label">Cash</div>
+    <div class="value">${{ "%.2f"|format(portfolio.cash) }}</div>
+  </div>
+  <div class="card">
+    <div class="label">Open Positions</div>
+    <div class="value">{{ portfolio.positions|length }}</div>
+  </div>
+  <div class="card">
+    <div class="label">Realized P&amp;L</div>
+    <div class="value {% if realized_pnl.val >= 0 %}green{% else %}red{% endif %}">
+      ${{ "%+.2f"|format(realized_pnl.val) }}
+    </div>
+  </div>
+</div>
+
+<h2>Open Positions</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Symbol</th>
+      <th>Shares</th>
+      <th>Avg Price</th>
+      <th>Cost Basis</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if portfolio.positions %}
+      {% for symbol, pos in portfolio.positions.items() %}
+      <tr>
+        <td><strong>{{ symbol }}</strong></td>
+        <td>{{ "%.4f"|format(pos.shares) }}</td>
+        <td>${{ "%.2f"|format(pos.avg_price) }}</td>
+        <td>${{ "%.2f"|format(pos.shares * pos.avg_price) }}</td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      <tr><td colspan="4" class="empty">No open positions.</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+
+<h2>Recent Trades</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Time</th>
+      <th>Symbol</th>
+      <th>Action</th>
+      <th>Shares</th>
+      <th>Price</th>
+      <th>P&amp;L</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if trades %}
+      {% for t in trades %}
+      <tr>
+        <td>{{ t.time[:16]|replace("T", " ") }}</td>
+        <td><strong>{{ t.symbol }}</strong></td>
+        <td><span class="badge {{ t.action }}">{{ t.action }}</span></td>
+        <td>{{ "%.4f"|format(t.shares) }}</td>
+        <td>${{ "%.2f"|format(t.price) }}</td>
+        <td>{% if t.pnl is defined %}<span class="{% if t.pnl >= 0 %}green{% else %}red{% endif %}">${{ "%+.2f"|format(t.pnl) }}</span>{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    {% else %}
+      <tr><td colspan="6" class="empty">No trades yet.</td></tr>
+    {% endif %}
+  </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robo Trader</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; color: #1a1a2e; }
+
+    nav { background: #1a1a2e; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 56px; }
+    nav .brand { color: #fff; font-weight: 700; font-size: 1.1rem; letter-spacing: .5px; }
+    nav a { color: #aab; text-decoration: none; font-size: .9rem; padding: .25rem 0; border-bottom: 2px solid transparent; }
+    nav a:hover, nav a.active { color: #fff; border-bottom-color: #4f8ef7; }
+
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+    h2 { font-size: 1rem; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 1rem; }
+
+    .cards { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+    .card { background: #fff; border-radius: 8px; padding: 1.25rem 1.5rem; flex: 1; min-width: 160px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .card .label { font-size: .75rem; color: #888; text-transform: uppercase; letter-spacing: .5px; }
+    .card .value { font-size: 1.5rem; font-weight: 700; margin-top: .25rem; }
+    .card .value.green { color: #2ecc71; }
+    .card .value.red { color: #e74c3c; }
+
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 2rem; }
+    th { background: #f8f9fb; text-align: left; padding: .75rem 1rem; font-size: .75rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid #eee; }
+    td { padding: .75rem 1rem; font-size: .875rem; border-bottom: 1px solid #f0f0f0; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafbff; }
+
+    .badge { display: inline-block; padding: .2rem .6rem; border-radius: 4px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .badge.buy { background: #d4f5e2; color: #1a7a45; }
+    .badge.sell { background: #fde8e8; color: #a02020; }
+    .badge.hold { background: #efefef; color: #777; }
+
+    .btn { display: inline-block; padding: .6rem 1.25rem; background: #4f8ef7; color: #fff; border-radius: 6px; text-decoration: none; font-size: .875rem; font-weight: 600; transition: background .15s; }
+    .btn:hover { background: #3a7de0; }
+    .btn.loading { background: #999; pointer-events: none; }
+
+    .error { background: #fde8e8; color: #a02020; padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: .875rem; }
+    .empty { color: #aaa; font-size: .875rem; padding: 1.5rem 1rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <span class="brand">Robo Trader</span>
+    <a href="/" {% if active == 'portfolio' %}class="active"{% endif %}>Portfolio</a>
+    <a href="/scan" {% if active == 'signals' %}class="active"{% endif %}>Scan Signals</a>
+  </nav>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
