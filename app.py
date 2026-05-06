@@ -135,25 +135,32 @@ def watchlist():
     return render_template('watchlist.html', rows=rows, error=error)
 
 
+VALID_SPANS = {'month', '3month', 'year'}
+
 @app.route('/chart/')
 @app.route('/chart/<symbol>')
 @login_required
 def chart(symbol='GLD'):
     symbol = symbol.upper()
+    span = request.args.get('span', '3month')
+    if span not in VALID_SPANS:
+        span = '3month'
+
     chart_data = None
     error = None
     try:
         rh_login()
-        df = get_historicals(symbol)
+        df = get_historicals(symbol, span=span)
         rh_logout()
 
-        if df is not None and len(df) >= 51:
+        if df is not None and len(df) >= 20:
             closes = df['close_price']
+            has_ma50 = len(df) >= 51
             chart_data = json.dumps({
                 'labels': df['begins_at'].dt.strftime('%b %d').tolist(),
                 'prices': clean(closes),
                 'ma20': clean(calculate_ma(closes, 20)),
-                'ma50': clean(calculate_ma(closes, 50)),
+                'ma50': clean(calculate_ma(closes, 50)) if has_ma50 else None,
                 'rsi': clean(calculate_rsi(closes)),
             })
         else:
@@ -162,7 +169,7 @@ def chart(symbol='GLD'):
         error = str(e)
 
     return render_template('chart.html', symbol=symbol, watchlist=WATCHLIST,
-                           chart_data=chart_data, error=error,
+                           chart_data=chart_data, error=error, span=span,
                            rsi_oversold=RSI_OVERSOLD, rsi_overbought=RSI_OVERBOUGHT)
 
 

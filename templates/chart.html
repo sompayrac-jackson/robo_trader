@@ -5,13 +5,23 @@
 
 <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
   <h2 style="margin:0;">Price Chart</h2>
-  <form id="ticker-form" style="display:flex; gap:.5rem;">
-    <select name="symbol" onchange="window.location='/chart/'+this.value" style="padding:.5rem .75rem; border:1px solid #ddd; border-radius:6px; font-size:.875rem; background:#fff; cursor:pointer;">
-      {% for t in watchlist %}
-        <option value="{{ t }}" {% if t == symbol %}selected{% endif %}>{{ t }}</option>
-      {% endfor %}
-    </select>
-  </form>
+
+  <select onchange="window.location='/chart/'+this.value+'?span={{ span }}'" style="padding:.5rem .75rem; border:1px solid #ddd; border-radius:6px; font-size:.875rem; background:#fff; cursor:pointer;">
+    {% for t in watchlist %}
+      <option value="{{ t }}" {% if t == symbol %}selected{% endif %}>{{ t }}</option>
+    {% endfor %}
+  </select>
+
+  <div style="display:flex; border:1px solid #ddd; border-radius:6px; overflow:hidden; font-size:.8rem; font-weight:600;">
+    {% for label, value in [('1M', 'month'), ('3M', '3month'), ('1Y', 'year')] %}
+    <a href="/chart/{{ symbol }}?span={{ value }}"
+       style="padding:.45rem .9rem; text-decoration:none;
+              background:{% if span == value %}#1a1a2e{% else %}#fff{% endif %};
+              color:{% if span == value %}#fff{% else %}#555{% endif %};">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
 </div>
 
 {% if error %}
@@ -46,16 +56,17 @@
     elements: { point: { radius: 0 }, line: { borderWidth: 1.5 } },
   };
 
+  const priceDatasets = [
+    { label: '{{ symbol }}', data: data.prices, borderColor: '#1a1a2e', backgroundColor: 'rgba(26,26,46,.06)', fill: true, tension: .3 },
+    { label: 'MA20', data: data.ma20, borderColor: '#4f8ef7', borderDash: [4,3], tension: .3 },
+  ];
+  if (data.ma50) {
+    priceDatasets.push({ label: 'MA50', data: data.ma50, borderColor: '#f7944f', borderDash: [4,3], tension: .3 });
+  }
+
   new Chart(document.getElementById('priceChart'), {
     type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: '{{ symbol }}', data: data.prices, borderColor: '#1a1a2e', backgroundColor: 'rgba(26,26,46,.06)', fill: true, tension: .3 },
-        { label: 'MA20', data: data.ma20, borderColor: '#4f8ef7', borderDash: [4,3], tension: .3 },
-        { label: 'MA50', data: data.ma50, borderColor: '#f7944f', borderDash: [4,3], tension: .3 },
-      ],
-    },
+    data: { labels, datasets: priceDatasets },
     options: { ...commonOptions, scales: { x: { ticks: { maxTicksLimit: 10 } } } },
   });
 
@@ -65,8 +76,8 @@
       labels,
       datasets: [
         { label: 'RSI', data: data.rsi, borderColor: '#9b59b6', tension: .3 },
-        { label: 'Overbought ({{ rsi_overbought }})', data: Array(labels.length).fill({{ rsi_overbought }}), borderColor: '#e74c3c', borderDash: [6,3], pointRadius: 0 },
-        { label: 'Oversold ({{ rsi_oversold }})', data: Array(labels.length).fill({{ rsi_oversold }}), borderColor: '#2ecc71', borderDash: [6,3], pointRadius: 0 },
+        { label: 'Overbought ({{ rsi_overbought }})', data: Array(labels.length).fill({{ rsi_overbought }}), borderColor: '#e74c3c', borderDash: [6,3] },
+        { label: 'Oversold ({{ rsi_oversold }})', data: Array(labels.length).fill({{ rsi_oversold }}), borderColor: '#2ecc71', borderDash: [6,3] },
       ],
     },
     options: {
