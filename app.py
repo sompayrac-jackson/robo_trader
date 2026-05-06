@@ -1,14 +1,47 @@
-from flask import Flask, render_template
+import os
+import functools
+from flask import Flask, render_template, request, redirect, url_for, session
+from dotenv import load_dotenv
 from paper_trader import load_portfolio
 from rsi_strategy import scan_watchlist as rsi_scan
 from ma_strategy import scan_watchlist as ma_scan
 from trader import merge_signals
-from auth import login, logout
+from auth import login as rh_login, logout as rh_logout
+
+load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY')
+
+
+def login_required(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        if not session.get('authenticated'):
+            return redirect(url_for('login_page'))
+        return f(*args, **kwargs)
+    return wrapper
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+    error = None
+    if request.method == 'POST':
+        if request.form.get('password') == os.getenv('DASHBOARD_PASSWORD'):
+            session['authenticated'] = True
+            return redirect(url_for('index'))
+        error = 'Incorrect password.'
+    return render_template('login.html', error=error)
+
+
+@app.route('/logout')
+def logout_page():
+    session.clear()
+    return redirect(url_for('login_page'))
 
 
 @app.route('/')
+@login_required
 def index():
     portfolio = load_portfolio()
     trades = list(reversed(portfolio.get('trades', [])))[:20]
@@ -16,12 +49,13 @@ def index():
 
 
 @app.route('/scan')
+@login_required
 def scan():
     try:
-        login()
+        rh_login()
         rsi_signals = rsi_scan()
         ma_signals = ma_scan()
-        logout()
+        rh_logout()
     except Exception as e:
         return render_template('signals.html', signals=[], error=str(e))
 

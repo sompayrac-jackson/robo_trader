@@ -47,6 +47,7 @@
     <span class="brand">Robo Trader</span>
     <a href="/" {% if active == 'portfolio' %}class="active"{% endif %}>Portfolio</a>
     <a href="/scan" {% if active == 'signals' %}class="active"{% endif %}>Scan Signals</a>
+    <a href="/logout" style="margin-left:auto;">Logout</a>
   </nav>
   <main>
     {% block content %}{% endblock %}
