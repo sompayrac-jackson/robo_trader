@@ -10,7 +10,7 @@ from ma_strategy import scan_watchlist as ma_scan
 from trader import merge_signals
 from auth import login as rh_login, logout as rh_logout
 from data import get_historicals, calculate_rsi, calculate_ma
-from config import WATCHLIST
+from config import WATCHLIST, TICKER_NAMES
 from rsi_strategy import RSI_OVERSOLD, RSI_OVERBOUGHT
 
 load_dotenv()
@@ -132,7 +132,7 @@ def watchlist():
     except Exception as e:
         error = str(e)
 
-    return render_template('watchlist.html', rows=rows, error=error)
+    return render_template('watchlist.html', rows=rows, error=error, ticker_names=TICKER_NAMES)
 
 
 VALID_SPANS = {'month', '3month', 'year'}
@@ -170,7 +170,8 @@ def chart(symbol='GLD'):
 
     return render_template('chart.html', symbol=symbol, watchlist=WATCHLIST,
                            chart_data=chart_data, error=error, span=span,
-                           rsi_oversold=RSI_OVERSOLD, rsi_overbought=RSI_OVERBOUGHT)
+                           rsi_oversold=RSI_OVERSOLD, rsi_overbought=RSI_OVERBOUGHT,
+                           ticker_names=TICKER_NAMES)
 
 
 if __name__ == '__main__':

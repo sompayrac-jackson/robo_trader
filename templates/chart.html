@@ -8,7 +8,7 @@
 
   <select onchange="window.location='/chart/'+this.value+'?span={{ span }}'" style="padding:.5rem .75rem; border:1px solid #ddd; border-radius:6px; font-size:.875rem; background:#fff; cursor:pointer;">
     {% for t in watchlist %}
-      <option value="{{ t }}" {% if t == symbol %}selected{% endif %}>{{ t }}</option>
+      <option value="{{ t }}" {% if t == symbol %}selected{% endif %}>{{ t }} — {{ ticker_names[t] }}</option>
     {% endfor %}
   </select>
 
