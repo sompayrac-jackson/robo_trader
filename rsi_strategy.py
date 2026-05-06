@@ -1,8 +1,7 @@
 from data import get_historicals, calculate_rsi, calculate_ma
+from config import WATCHLIST
 
-WATCHLIST = ['GLD', 'UCO', 'AGQ', 'XLE', 'XLF', 'XLB', 'XLV', 'XLK']
-
-RSI_OVERSOLD = 30
+RSI_OVERSOLD = 35
 RSI_OVERBOUGHT = 70
 
 
@@ -17,11 +16,10 @@ def get_signal(symbol):
 
     current_price = closes.iloc[-1]
     current_rsi = rsi.iloc[-1]
-    prev_rsi = rsi.iloc[-2]
     current_ma = ma20.iloc[-1]
 
-    # Buy: RSI crosses up through 30 AND price is above 20-day MA
-    if prev_rsi < RSI_OVERSOLD and current_rsi >= RSI_OVERSOLD and current_price > current_ma:
+    # Buy: RSI is oversold AND price is above 20-day MA
+    if current_rsi <= RSI_OVERSOLD and current_price > current_ma:
         return 'buy', current_price, current_rsi
 
     # Sell: RSI crosses above 70 OR price drops below 20-day MA
