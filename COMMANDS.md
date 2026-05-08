@@ -1,20 +1,31 @@
 # Robo Trader — Command Reference
 
-## Droplet / App
+## Web Dashboard (robo_trader)
 
 | Task | Command |
 |------|---------|
-| View app status | `systemctl status robo_trader` |
-| Start app | `systemctl start robo_trader` |
-| Stop app | `systemctl stop robo_trader` |
+| View status | `systemctl status robo_trader` |
+| Start | `systemctl start robo_trader` |
+| Stop | `systemctl stop robo_trader` |
 | Restart after code changes | `systemctl restart robo_trader` |
 | Watch live logs | `journalctl -u robo_trader -f` |
+
+## Scheduler (robo_scheduler)
+
+| Task | Command |
+|------|---------|
+| View status | `systemctl status robo_scheduler` |
+| Start | `systemctl start robo_scheduler` |
+| Stop | `systemctl stop robo_scheduler` |
+| Restart | `systemctl restart robo_scheduler` |
+| Watch live logs | `journalctl -u robo_scheduler -f` |
 
 ## Deploying Code Changes
 
 ```bash
 git pull
 systemctl restart robo_trader
+systemctl restart robo_scheduler
 ```
 
 ## Virtual Environment
@@ -48,3 +59,5 @@ ufw allow 5000                 # open port 5000 if blocked
 |------|-----|
 | Portfolio | http://104.248.62.36:5000 |
 | Scan Signals | http://104.248.62.36:5000/scan |
+| Watchlist | http://104.248.62.36:5000/watchlist |
+| Chart | http://104.248.62.36:5000/chart |
